@@ -1,40 +1,9 @@
 use leptos::*;
-
-use std::{borrow::Borrow, cell::RefCell, rc::Rc};
+use std::*;
 
 #[deny(warnings)]
 #[allow(unused)]
 #[allow(non_snake_case)]
-
-
-
-
-fn App() -> impl IntoView {
-    let expression = State::new(String::new());
-    let result = State::new(String::new());
-
-    view! {
-        <div>
-            <input
-                type="text"
-                placeholder="Enter expression (e.g., 2 + 2)"
-                value={expression.clone()}
-                oninput={move |e: InputEvent| expression.set(e.value())}
-            />
-            <button onclick={move || calculate(expression.clone(), result.clone())}>Calculate</button>
-            <div>{result.clone()}</div>
-        </div>
-    }
-}
-
-fn calculate(expression: State<String>, result: State<String>) {
-    let expr = expression.get();
-    let res = evaluate_expression(&expr);
-    match res {
-        Ok(value) => result.set(format!("Result: {}", value)),
-        Err(err) => result.set(format!("Error: {}", err)),
-    }
-}
 
 pub fn evaluate_expression(expr: &str) -> Result<f64, String> {
     let parts: Vec<&str> = expr.split_whitespace().collect();
@@ -69,9 +38,39 @@ pub fn evaluate_expression(expr: &str) -> Result<f64, String> {
 }
 
 
-
 fn main() {
-    mount_to_body(move || {
-        view! { <App/> }
-    });
+    leptos::mount_to_body(App)
+}
+
+
+#[component]
+fn App() -> impl IntoView {
+    view! {
+        <h2>"Controlled Component"</h2>
+        <ControlledComponent/>
+    }
+}
+
+#[component]
+fn ControlledComponent() -> impl IntoView {
+
+    let (expression, _set_expression) = create_signal("".to_string());
+    let (result, set_result) = create_signal("".to_string());
+
+    view! {
+        <div>
+            <input
+                type="text"
+                placeholder="Enter expression (e.g., 2 + 2)"
+                value={expression.clone()}
+                on:input=move |ev| {
+                    set_result.set(evaluate_expression(&event_target_value(&ev).to_string()).unwrap().to_string());
+                }
+                prop:value=expression
+            />
+            //<button onclick={move || (expression.clone(), result.clone())}>Calculate</button>
+            <div>{result}</div>
+        </div>
+    }
+
 }
