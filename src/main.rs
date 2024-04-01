@@ -46,8 +46,10 @@ fn main() {
 #[component]
 fn App() -> impl IntoView {
     view! {
-        <h2>"Controlled Component"</h2>
+        <div class="calculator">
+        <h2>"WASM Calculator"</h2>
         <ControlledComponent/>
+        </div>
     }
 }
 
@@ -61,14 +63,13 @@ fn ControlledComponent() -> impl IntoView {
         <div>
             <input
                 type="text"
-                placeholder="Enter expression (e.g., 2 + 2)"
+                placeholder="Enter expression (e.g 2 + 2)"
                 value={expression.clone()}
                 on:input=move |ev| {
                     set_result.set(evaluate_expression(&event_target_value(&ev).to_string()).unwrap().to_string());
                 }
                 prop:value=expression
             />
-            //<button onclick={move || (expression.clone(), result.clone())}>Calculate</button>
             <div>{result}</div>
         </div>
     }
